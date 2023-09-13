@@ -10,20 +10,20 @@ export const secondaryFmt = chalk.dim;
 
 export async function askFeature() {
   return await select({
-    message: 'Which feature is your need?',
+    message: 'Which feature do you need?',
     choices: [
       {
-        name: 'Recursive rename file',
+        name: 'Recursive rename files',
         value: Feature.Rename,
         description: secondaryFmt(
-          'Entering a directory path, rename all files of sub directories to parent, the multiple files will add suffix by index.',
+          'Entering a directory path, rename all files in subdirectories to parent; the multiple files will add a suffix by index.',
         ),
       },
       {
-        name: 'Remove empty folder',
+        name: 'Remove empty folders',
         value: Feature.Remove,
         description: secondaryFmt(
-          'Entering a directory path, remove all empty folder recursively.',
+          'Entering a directory path, remove all empty folders recursively.',
         ),
       },
     ],
@@ -32,10 +32,10 @@ export async function askFeature() {
 
 export async function askPath() {
   return await input({
-    message: 'Please input a path for feature executing:',
+    message: 'Please input a path for feature execution:',
     validate(value) {
       if (!isAbsolute(value)) {
-        return errorFmt(`'${value}' is not available filesystem path.`);
+        return errorFmt(`'${value}' is not an available filesystem path.`);
       }
       return true;
     },
