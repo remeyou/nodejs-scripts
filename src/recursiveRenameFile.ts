@@ -1,12 +1,15 @@
 import { readdir, rename, stat } from 'fs/promises';
 import { parse, resolve } from 'path';
+import { secondaryFmt, successFmt } from './utils';
 
 function renameFile(path: string, index?: number) {
   const { dir, ext } = parse(path);
   const parentDir = dir.split('\\').at(-1);
   const suffix = index ? '-' + index : '';
   const newPath = resolve(dir, parentDir + suffix + ext);
-  rename(path, newPath).then(() => console.log('renamed ->', newPath));
+  rename(path, newPath).then(() =>
+    console.log(successFmt('renamed'), secondaryFmt('->'), newPath),
+  );
 }
 
 function doDir(path: string) {

@@ -1,8 +1,11 @@
 import { readdir, rmdir, stat } from 'fs/promises';
 import { resolve } from 'path';
+import { secondaryFmt, successFmt } from './utils';
 
 function removeDir(path: string) {
-  rmdir(path).then(() => console.log('removed ->', path));
+  rmdir(path).then(() =>
+    console.log(successFmt('removed'), secondaryFmt('->'), path),
+  );
 }
 
 function doDir(path: string) {
