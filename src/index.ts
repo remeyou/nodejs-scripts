@@ -1,32 +1,19 @@
-import minimist from 'minimist';
-import { isAbsolute } from 'path';
-import { argv } from 'process';
+import { Feature } from './constants';
 import recursiveRenameFile from './recursiveRenameFile';
 import removeEmptyFolder from './removeEmptyFolder';
+import { askFeature, askPath } from './utils';
 
-function main() {
-  // init
-  const args = minimist(argv);
-  const { path, action } = args;
+(async function async() {
+  const feature = await askFeature();
 
-  // validate
-  if (!isAbsolute(path)) {
-    console.error(path, 'is not available file path. ');
-    return;
-  }
+  const path = await askPath();
 
-  // task
-  switch (action) {
-    case 'test':
-      console.log(args);
-      break;
-    case 'remove':
+  switch (feature) {
+    case Feature.Remove:
       removeEmptyFolder(path);
       break;
-    case 'rename':
+    case Feature.Rename:
       recursiveRenameFile(path);
       break;
   }
-}
-
-main();
+})();
