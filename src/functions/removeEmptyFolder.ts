@@ -1,6 +1,6 @@
 import { readdir, rmdir, stat } from 'fs/promises';
 import { resolve } from 'path';
-import { secondaryFmt, successFmt } from './utils';
+import { askPath, inquirerErr, secondaryFmt, successFmt } from '../utils';
 
 function removeDir(path: string) {
   rmdir(path).then(() =>
@@ -20,4 +20,13 @@ function doFile(path: string) {
   stat(path).then((obj) => obj.isDirectory() && doDir(path));
 }
 
-export default doFile;
+async function removeEmptyFolder() {
+  try {
+    const path = await askPath();
+    doFile(path);
+  } catch (error) {
+    inquirerErr(error as Error);
+  }
+}
+
+export default removeEmptyFolder;

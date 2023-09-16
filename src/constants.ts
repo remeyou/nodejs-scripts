@@ -1,6 +1,7 @@
-export const enum Feature {
+export const enum Fns {
   Rename,
   Remove,
+  Guess,
 }
 
 export const enum ErrorMsg {

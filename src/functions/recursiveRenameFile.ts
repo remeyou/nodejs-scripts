@@ -1,6 +1,6 @@
 import { readdir, rename, stat } from 'fs/promises';
 import { parse, resolve } from 'path';
-import { secondaryFmt, successFmt } from './utils';
+import { askPath, inquirerErr, secondaryFmt, successFmt } from '../utils';
 
 function renameFile(path: string, index?: number) {
   const { dir, ext } = parse(path);
@@ -30,4 +30,13 @@ function doFile(path: string, index?: number) {
   });
 }
 
-export default doFile;
+async function recursiveRenameFile() {
+  try {
+    const path = await askPath();
+    doFile(path);
+  } catch (error) {
+    inquirerErr(error as Error);
+  }
+}
+
+export default recursiveRenameFile;
