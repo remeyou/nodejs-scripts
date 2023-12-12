@@ -88,7 +88,7 @@ async function guessGame() {
     firstName = await getFirstName();
     options = await getOptions();
   } catch (error) {
-    inquirerErr(error as Error);
+    inquirerErr(error);
     return;
   }
   console.log('Calling API(s) might task some time...');

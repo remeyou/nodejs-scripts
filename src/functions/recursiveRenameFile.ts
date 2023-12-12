@@ -35,7 +35,7 @@ async function recursiveRenameFile() {
     const path = await askPath();
     doFile(path);
   } catch (error) {
-    inquirerErr(error as Error);
+    inquirerErr(error);
   }
 }
 

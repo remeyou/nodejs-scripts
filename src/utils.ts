@@ -8,8 +8,8 @@ export const errorFmt = chalk.red;
 export const successFmt = chalk.green;
 export const secondaryFmt = chalk.dim;
 
-export async function askFeature() {
-  return await select({
+export function askFeature() {
+  return select({
     message: 'Which feature do you need?',
     choices: [
       {
@@ -37,8 +37,8 @@ export async function askFeature() {
   });
 }
 
-export async function askPath() {
-  return await input({
+export const askPath = () =>
+  input({
     message: 'Please input a path for feature execution:',
     validate(value) {
       if (!isAbsolute(value)) {
@@ -47,12 +47,11 @@ export async function askPath() {
       return true;
     },
   });
-}
 
-export function inquirerErr(error: Error) {
-  if (error.message === ErrorMsg.UserCancel) {
-    console.log(secondaryFmt('Press Enter to exit.'));
+export function inquirerErr(err: unknown) {
+  if (err instanceof Error && err.message === ErrorMsg.UserCancel) {
+    console.log(secondaryFmt('Ctrl + C pressed, script will exit.'));
     return;
   }
-  console.error(errorFmt('Oops! script crashed.'), error);
+  console.error(errorFmt('Oops! script crashed.'), err);
 }

@@ -19,6 +19,6 @@ import { askFeature, inquirerErr } from './utils';
         guessGame();
     }
   } catch (error) {
-    inquirerErr(error as Error);
+    inquirerErr(error);
   }
 })();
