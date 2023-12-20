@@ -1,24 +1,21 @@
-import { Fns } from './constants';
-import guessGame from './functions/guessGame';
-import recursiveRenameFile from './functions/recursiveRenameFile';
-import removeEmptyFolder from './functions/removeEmptyFolder';
-import { askFeature, inquirerErr } from './utils';
+import { Fns } from './constants'
+import recursiveRenameFile from './functions/recursiveRenameFile'
+import removeEmptyFolder from './functions/removeEmptyFolder'
+import { askFeature, inquirerErr } from './utils'
 
-(async function async() {
+;(async function async() {
   try {
-    const fn = await askFeature();
+    const fn = await askFeature()
 
     switch (fn) {
       case Fns.Remove:
-        removeEmptyFolder();
-        break;
+        removeEmptyFolder()
+        break
       case Fns.Rename:
-        recursiveRenameFile();
-        break;
-      case Fns.Guess:
-        guessGame();
+        recursiveRenameFile()
+        break
     }
   } catch (error) {
-    inquirerErr(error);
+    inquirerErr(error)
   }
-})();
+})()

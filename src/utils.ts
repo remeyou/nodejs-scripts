@@ -1,24 +1,17 @@
-import input from '@inquirer/input';
-import select from '@inquirer/select';
-import chalk from 'chalk';
-import { isAbsolute } from 'path';
-import { ErrorMsg, Fns } from './constants';
+import input from '@inquirer/input'
+import select from '@inquirer/select'
+import chalk from 'chalk'
+import { isAbsolute } from 'path'
+import { ErrorMsg, Fns } from './constants'
 
-export const errorFmt = chalk.red;
-export const successFmt = chalk.green;
-export const secondaryFmt = chalk.dim;
+export const errorFmt = chalk.red
+export const successFmt = chalk.green
+export const secondaryFmt = chalk.dim
 
 export function askFeature() {
   return select({
     message: 'Which feature do you need?',
     choices: [
-      {
-        name: 'Guess Game',
-        value: Fns.Guess,
-        description: secondaryFmt(
-          'Entering a name, APIs will guess gender or nation of the name.',
-        ),
-      },
       {
         name: 'Recursive rename files',
         value: Fns.Rename,
@@ -34,7 +27,7 @@ export function askFeature() {
         ),
       },
     ],
-  });
+  })
 }
 
 export const askPath = () =>
@@ -42,16 +35,16 @@ export const askPath = () =>
     message: 'Please input a path for feature execution:',
     validate(value) {
       if (!isAbsolute(value)) {
-        return errorFmt(`'${value}' is not an available filesystem path.`);
+        return errorFmt(`'${value}' is not an available filesystem path.`)
       }
-      return true;
+      return true
     },
-  });
+  })
 
 export function inquirerErr(err: unknown) {
   if (err instanceof Error && err.message === ErrorMsg.UserCancel) {
-    console.log(secondaryFmt('Ctrl + C pressed, script will exit.'));
-    return;
+    console.log(secondaryFmt('Ctrl + C pressed, script will exit.'))
+    return
   }
-  console.error(errorFmt('Oops! script crashed.'), err);
+  console.error(errorFmt('Oops! script crashed.'), err)
 }

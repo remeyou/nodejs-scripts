@@ -10,5 +10,6 @@
   "plugins": ["prettier-plugin-organize-imports", "prettier-plugin-packagejson"],
   "printWidth": 80,
   "singleQuote": true,
-  "trailingComma": "all"
+  "trailingComma": "all",
+  "semi": false
 }
