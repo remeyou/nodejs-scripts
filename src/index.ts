@@ -1,21 +1,13 @@
-import { Fns } from './constants'
-import recursiveRenameFile from './functions/recursiveRenameFile'
-import removeEmptyFolder from './functions/removeEmptyFolder'
+import { Features } from './constants'
+import recursiveRenameFile from './lib/recursiveRenameFile'
+import removeEmptyFolder from './lib/removeEmptyFolder'
 import { askFeature, inquirerErr } from './utils'
 
-;(async function async() {
-  try {
-    const fn = await askFeature()
+const features = {
+  [Features.Remove]: removeEmptyFolder,
+  [Features.Rename]: recursiveRenameFile,
+}
 
-    switch (fn) {
-      case Fns.Remove:
-        removeEmptyFolder()
-        break
-      case Fns.Rename:
-        recursiveRenameFile()
-        break
-    }
-  } catch (error) {
-    inquirerErr(error)
-  }
-})()
+askFeature()
+  .then((f) => features[f]())
+  .catch(inquirerErr)

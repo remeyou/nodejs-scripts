@@ -1,4 +1,4 @@
-export const enum Fns {
+export const enum Features {
   Rename,
   Remove,
 }

@@ -2,7 +2,7 @@ import { readdir, rename, stat } from 'fs/promises'
 import { parse, resolve } from 'path'
 import { askPath, inquirerErr, secondaryFmt, successFmt } from '../utils'
 
-function renameFile(path: string, index?: number) {
+const renameFile = (path: string, index?: number) => {
   const { dir, ext } = parse(path)
   const parentDir = dir.split('\\').at(-1)
   const suffix = index ? '-' + index : ''
@@ -12,31 +12,17 @@ function renameFile(path: string, index?: number) {
   )
 }
 
-function doDir(path: string) {
+const handleDir = (path: string) =>
   readdir(path).then((list) =>
-    list.map((file) => resolve(path, file)).forEach(doFile),
+    list.map((file) => resolve(path, file)).forEach(handleFile),
   )
-}
 
-function doFile(path: string, index?: number) {
-  stat(path).then((obj) => {
-    if (obj.isFile()) {
-      renameFile(path, index)
-      return
-    }
-    if (obj.isDirectory()) {
-      doDir(path)
-    }
+const handleFile = (path: string, index?: number) =>
+  stat(path).then((stats) => {
+    if (stats.isFile()) renameFile(path, index)
+    if (stats.isDirectory()) handleDir(path)
   })
-}
 
-async function recursiveRenameFile() {
-  try {
-    const path = await askPath()
-    doFile(path)
-  } catch (error) {
-    inquirerErr(error)
-  }
-}
+const recursiveRenameFile = () => askPath().then(handleFile).catch(inquirerErr)
 
 export default recursiveRenameFile
