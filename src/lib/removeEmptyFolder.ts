@@ -1,10 +1,10 @@
 import { readdir, rmdir, stat } from 'fs/promises'
 import { resolve } from 'path'
-import { askPath, inquirerErr, secondaryFmt, successFmt } from '../utils'
+import { askPath, infoFmt, inquirerErr, successFmt } from '../utils'
 
 const removeDir = (path: string) =>
   rmdir(path).then(() =>
-    console.log(successFmt('removed'), secondaryFmt('->'), path),
+    console.log(successFmt('removed'), infoFmt('->'), path),
   )
 
 const handleDir = (path: string) =>

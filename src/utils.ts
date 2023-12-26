@@ -6,7 +6,7 @@ import { ErrorMsg, Features } from './constants'
 
 export const errorFmt = chalk.red
 export const successFmt = chalk.green
-export const secondaryFmt = chalk.dim
+export const infoFmt = chalk.dim
 
 export const askFeature = () =>
   select({
@@ -15,14 +15,14 @@ export const askFeature = () =>
       {
         name: 'Recursive rename files',
         value: Features.Rename,
-        description: secondaryFmt(
+        description: infoFmt(
           'Entering a directory path, rename all files in subdirectories to parent. The multiple files will add a suffix by index.',
         ),
       },
       {
         name: 'Remove empty folders',
         value: Features.Remove,
-        description: secondaryFmt(
+        description: infoFmt(
           'Entering a directory path, remove all empty folders recursively.',
         ),
       },
@@ -42,5 +42,5 @@ export const askPath = () =>
 
 export const inquirerErr = (err: unknown) =>
   err instanceof Error && err.message === ErrorMsg.UserCancel
-    ? console.log(secondaryFmt('Ctrl + C pressed, script will exit.'))
+    ? console.log(infoFmt('Ctrl + C pressed, script will exit.'))
     : console.error(errorFmt('Oops! script crashed.'), err)

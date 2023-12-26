@@ -1,6 +1,6 @@
 import { readdir, rename, stat } from 'fs/promises'
 import { parse, resolve } from 'path'
-import { askPath, inquirerErr, secondaryFmt, successFmt } from '../utils'
+import { askPath, infoFmt, inquirerErr, successFmt } from '../utils'
 
 const renameFile = (path: string, index?: number) => {
   const { dir, ext } = parse(path)
@@ -8,7 +8,7 @@ const renameFile = (path: string, index?: number) => {
   const suffix = index ? '-' + index : ''
   const newPath = resolve(dir, parentDir + suffix + ext)
   rename(path, newPath).then(() =>
-    console.log(successFmt('renamed'), secondaryFmt('->'), newPath),
+    console.log(successFmt('renamed'), infoFmt('->'), newPath),
   )
 }
 
