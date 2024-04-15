@@ -18,7 +18,7 @@ const readCache = async (path: string, tmpPath: string) => {
     await stat(cachePath)
     const cache = JSON.parse(await readFile(cachePath, { encoding: 'utf-8' }))
     if (
-      path === cache?.path &&
+      path === cache.path &&
       Date.now() - cache.timestamp < 24 * 60 * 60 * 1000
     ) {
       return cache.list as string[]
