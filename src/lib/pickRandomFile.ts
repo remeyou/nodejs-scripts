@@ -4,6 +4,7 @@ import { parse, resolve } from 'path'
 import { askFiletype, askPath } from '../utils'
 
 const generateCache = async (path: string, cachePath: string) => {
+  console.log('Generating cache, it will take for a moment...')
   const list = await readdir(path, { recursive: true })
   writeFile(cachePath, JSON.stringify({ timestamp: Date.now(), path, list }), {
     encoding: 'utf-8',
@@ -34,7 +35,7 @@ const init = async (path: string) => {
     await mkdir(tmpPath, { recursive: true })
   }
 
-  return await readCache(path, tmpPath)
+  return readCache(path, tmpPath)
 }
 
 const pickRandomFile = async () => {
@@ -56,10 +57,13 @@ const pickRandomFile = async () => {
         console.log('[OPEN]', absolutePath)
         execFile(`explorer`, [absolutePath])
         break
-      } catch (error) {}
+      } catch (error) {
+        console.log('[NO EXIST]', absolutePath)
+      }
+    } else {
+      console.log('[SKIP]', absolutePath)
     }
 
-    console.log('[SKIP]', absolutePath)
     idx = idx === list.length - 1 ? 0 : idx + 1
     if (idx === initIdx) {
       console.log('Cannot find a proper file.')
