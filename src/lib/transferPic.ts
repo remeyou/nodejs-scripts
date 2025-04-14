@@ -1,5 +1,5 @@
 import { execFile } from "child_process";
-import { readdir, stat } from "fs/promises";
+import { readdir, rm, stat } from "fs/promises";
 import { parse, resolve } from "path";
 import { IMAGE_FILE_TYPE } from "../constants";
 import { askPath, infoFmt, inquirerErr, successFmt } from "../utils";
@@ -21,6 +21,9 @@ const transfer = (path: string) => {
       throw err;
     }
     console.log(successFmt("transferred"), infoFmt("->"), output);
+    rm(path).then(() =>
+      console.log(successFmt("removed"), infoFmt("->"), path)
+    );
   });
 };
 
