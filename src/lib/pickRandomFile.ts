@@ -1,6 +1,6 @@
 import { execFile } from "child_process";
 import { mkdir, readFile, readdir, stat, writeFile } from "fs/promises";
-import { parse, resolve } from "path";
+import { parse, resolve, sep } from "path";
 import { askFiletype, askPath } from "../utils";
 
 const generateCache = async (path: string, cachePath: string) => {
@@ -13,7 +13,7 @@ const generateCache = async (path: string, cachePath: string) => {
 };
 
 const readCache = async (path: string, tmpPath: string) => {
-  const cachePath = tmpPath + "\\" + parse(path).name + ".txt";
+  const cachePath = tmpPath + sep + parse(path).name + ".txt";
   try {
     await stat(cachePath);
     const cache = JSON.parse(await readFile(cachePath, { encoding: "utf-8" }));
@@ -30,7 +30,7 @@ const readCache = async (path: string, tmpPath: string) => {
 };
 
 const init = async (path: string) => {
-  const tmpPath = __dirname + "\\tmp";
+  const tmpPath = __dirname + sep + "tmp";
   try {
     await stat(tmpPath);
   } catch (error) {

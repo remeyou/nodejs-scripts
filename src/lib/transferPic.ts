@@ -1,6 +1,6 @@
 import { execFile } from "child_process";
 import { readdir, rm, stat } from "fs/promises";
-import { parse, resolve } from "path";
+import { parse, resolve, sep } from "path";
 import { IMAGE_FILE_TYPE } from "../constants";
 import { askPath, infoFmt, inquirerErr, successFmt } from "../utils";
 
@@ -14,7 +14,7 @@ const transfer = (path: string) => {
     console.log("[SKIP]", path);
     return;
   }
-  const output = `${dir}\\${name}.webp`;
+  const output = `${dir}${sep}${name}.webp`;
   // The libwebp should be installed on the device for executing the cwebp command.
   execFile("cwebp", ["-q", "90", path, "-o", output], (err) => {
     if (err) {
