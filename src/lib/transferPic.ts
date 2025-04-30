@@ -16,15 +16,19 @@ const transfer = (path: string) => {
   }
   const output = `${dir}${sep}${name}.webp`;
   // The libwebp should be installed on the device for executing the cwebp command.
-  execFile("cwebp", ["-q", "90", path, "-o", output], (err) => {
-    if (err) {
-      throw err;
-    }
-    console.log(successFmt("transferred"), infoFmt("->"), output);
-    rm(path).then(() =>
-      console.log(successFmt("removed"), infoFmt("->"), path)
-    );
-  });
+  try {
+    execFile("cwebp", ["-q", "90", path, "-o", output], (err) => {
+      if (err) {
+        throw err;
+      }
+      console.log(successFmt("transferred"), infoFmt("->"), output);
+      rm(path).then(() =>
+        console.log(successFmt("removed"), infoFmt("->"), path)
+      );
+    });
+  } catch (error) {
+    console.error("cwebp executed error:", error);
+  }
 };
 
 const handleDir = (path: string) =>
