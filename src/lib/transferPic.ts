@@ -2,7 +2,7 @@ import { execFile } from "child_process";
 import { readdir, rm, stat } from "fs/promises";
 import { parse, resolve, sep } from "path";
 import { IMAGE_FILE_TYPE } from "../constants";
-import { askPath, infoFmt, inquirerErr, successFmt } from "../utils";
+import { askPath, errorFmt, infoFmt, inquirerErr, successFmt } from "../utils";
 
 const supportFileType = IMAGE_FILE_TYPE.filter(
   (s) => !["gif", "webp"].includes(s)
@@ -16,19 +16,16 @@ const transfer = (path: string) => {
   }
   const output = `${dir}${sep}${name}.webp`;
   // The libwebp should be installed on the device for executing the cwebp command.
-  try {
-    execFile("cwebp", ["-q", "90", path, "-o", output], (err) => {
-      if (err) {
-        throw err;
-      }
-      console.log(successFmt("transferred"), infoFmt("->"), output);
-      rm(path).then(() =>
-        console.log(successFmt("removed"), infoFmt("->"), path)
-      );
-    });
-  } catch (error) {
-    console.error("cwebp executed error:", error);
-  }
+  execFile("cwebp", ["-q", "90", path, "-o", output], (err, stdout, stderr) => {
+    if (err) {
+      console.error(errorFmt("cwebp executed error:"), stderr);
+      return;
+    }
+    console.log(successFmt("transferred"), infoFmt("->"), output);
+    rm(path).then(() =>
+      console.log(successFmt("removed"), infoFmt("->"), path)
+    );
+  });
 };
 
 const handleDir = (path: string) =>
