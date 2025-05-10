@@ -14,6 +14,13 @@ export const askFeature = () =>
     message: "Which feature do you need?",
     choices: [
       {
+        name: "Transfer picture(s) to WebP",
+        value: Features.Transfer,
+        description: infoFmt(
+          "Enter a directory path or a file path to recursively transfer files to WebP."
+        ),
+      },
+      {
         name: "Recursive rename files",
         value: Features.Rename,
         description: infoFmt(
@@ -32,13 +39,6 @@ export const askFeature = () =>
         value: Features.Random,
         description: infoFmt(
           "Entering a directory path, selecting a file type (optional), recursively picking a file, and opening it."
-        ),
-      },
-      {
-        name: "Transfer picture(s) to WebP",
-        value: Features.Transfer,
-        description: infoFmt(
-          "Enter a directory path or a file path to recursively transfer files to WebP."
         ),
       },
     ],
