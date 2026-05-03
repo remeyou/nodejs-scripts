@@ -8,7 +8,7 @@ const renameFile = (path: string, index?: number) => {
   const suffix = index ? "-" + index : "";
   const newPath = resolve(dir, parentDir + suffix + ext);
   rename(path, newPath).then(() =>
-    console.log(successFmt("renamed"), infoFmt("->"), newPath)
+    console.log(successFmt("rename"), infoFmt("->"), newPath)
   );
 };
 

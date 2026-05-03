@@ -58,7 +58,7 @@ const pickRandomFile = async () => {
         execFile(`explorer`, [absolutePath]);
         break;
       } catch (error) {
-        console.log("[NO EXIST]", absolutePath);
+        console.log("[VOID]", absolutePath);
       }
     } else {
       console.log("[SKIP]", absolutePath);

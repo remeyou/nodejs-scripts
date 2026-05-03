@@ -4,7 +4,7 @@ import { askPath, infoFmt, inquirerErr, successFmt } from '../utils'
 
 const removeDir = (path: string) =>
   rmdir(path).then(() =>
-    console.log(successFmt('removed'), infoFmt('->'), path),
+    console.log(successFmt('remove'), infoFmt('->'), path),
   )
 
 const handleDir = (path: string) =>

@@ -9,7 +9,7 @@ const supportFileType = IMAGE_FILE_TYPE.filter((s) => !["webp"].includes(s));
 const convert = (path: string) => {
   const { dir, name, ext } = parse(path);
   if (!supportFileType.includes(ext.slice(1))) {
-    console.log("[SKIP]", path);
+    console.log(infoFmt("ignore"), infoFmt("->"), path);
     return;
   }
   const output = `${dir}${sep}${name}.webp`;
