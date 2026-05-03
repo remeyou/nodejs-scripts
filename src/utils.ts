@@ -7,7 +7,7 @@ import { ErrorMsg, Features, IMAGE_FILE_TYPE } from "./constants";
 
 export const errorFmt = chalk.red;
 export const successFmt = chalk.green;
-export const infoFmt = chalk.dim;
+export const infoFmt = chalk.gray;
 
 export const askFeature = () =>
   select({
