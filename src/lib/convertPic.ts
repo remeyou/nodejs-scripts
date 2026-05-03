@@ -6,7 +6,7 @@ import { askPath, errorFmt, infoFmt, inquirerErr, successFmt } from "../utils";
 
 const supportFileType = IMAGE_FILE_TYPE.filter((s) => !["webp"].includes(s));
 
-const transfer = (path: string) => {
+const convert = (path: string) => {
   const { dir, name, ext } = parse(path);
   if (!supportFileType.includes(ext.slice(1))) {
     console.log("[SKIP]", path);
@@ -22,25 +22,25 @@ const transfer = (path: string) => {
         console.error(errorFmt("cwebp executed error:"), stderr);
         return;
       }
-      console.log(successFmt("transferred"), infoFmt("->"), output);
+      console.log(successFmt("output"), infoFmt("->"), output);
       rm(path).then(() =>
-        console.log(successFmt("removed"), infoFmt("->"), path)
+        console.log(successFmt("remove"), infoFmt("->"), path),
       );
-    }
+    },
   );
 };
 
 const handleDir = (path: string) =>
   readdir(path).then((list) =>
-    list.map((file) => resolve(path, file)).forEach(handleFile)
+    list.map((file) => resolve(path, file)).forEach(handleFile),
   );
 
 const handleFile = (path: string) =>
   stat(path).then((stats) => {
-    if (stats.isFile()) transfer(path);
+    if (stats.isFile()) convert(path);
     if (stats.isDirectory()) handleDir(path);
   });
 
-const transferPic = () => askPath().then(handleFile).catch(inquirerErr);
+const convertPic = () => askPath().then(handleFile).catch(inquirerErr);
 
-export default transferPic;
+export default convertPic;

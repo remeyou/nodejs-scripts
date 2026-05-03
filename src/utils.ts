@@ -14,31 +14,31 @@ export const askFeature = () =>
     message: "Which feature do you need?",
     choices: [
       {
-        name: "Transfer picture(s) to WebP",
-        value: Features.Transfer,
+        name: "Convert picture(s) to WebP",
+        value: Features.Convert,
         description: infoFmt(
-          "Enter a directory path or a file path to recursively transfer files to WebP."
+          "Enter a directory path or a file path to recursively convert files to WebP.",
         ),
       },
       {
         name: "Recursive rename files",
         value: Features.Rename,
         description: infoFmt(
-          "Enter a directory path and rename all files in subdirectories to parent. The multiple files will add a suffix by index."
+          "Enter a directory path and rename all files in subdirectories to parent. The multiple files will add a suffix by index.",
         ),
       },
       {
         name: "Remove empty folders",
         value: Features.Remove,
         description: infoFmt(
-          "Entering a directory path, remove all empty folders recursively."
+          "Entering a directory path, remove all empty folders recursively.",
         ),
       },
       {
         name: "Pick a random file",
         value: Features.Random,
         description: infoFmt(
-          "Entering a directory path, selecting a file type (optional), recursively picking a file, and opening it."
+          "Entering a directory path, selecting a file type (optional), recursively picking a file, and opening it.",
         ),
       },
     ],

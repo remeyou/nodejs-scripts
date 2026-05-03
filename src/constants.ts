@@ -2,7 +2,7 @@ export const enum Features {
   Rename,
   Remove,
   Random,
-  Transfer,
+  Convert,
 }
 
 export const IMAGE_FILE_TYPE = ["jpg", "png", "jfif", "gif", "webp"];
