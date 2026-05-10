@@ -46,7 +46,7 @@ export const askFeature = () =>
 
 export const askPath = () =>
   input({
-    message: "Please input a path for feature execution:",
+    message: "The path for feature execution:",
     validate(value) {
       if (!isAbsolute(value)) {
         return errorFmt(`'${value}' is not an available filesystem path.`);
