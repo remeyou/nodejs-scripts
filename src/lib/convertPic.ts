@@ -4,7 +4,9 @@ import { parse, resolve, sep } from "path";
 import { IMAGE_FILE_TYPE } from "../constants";
 import { askPath, errorFmt, infoFmt, inquirerErr, successFmt } from "../utils";
 
-const supportFileType = IMAGE_FILE_TYPE.filter((s) => !["webp"].includes(s));
+const supportFileType = IMAGE_FILE_TYPE.filter(
+  (s) => !["webp", "gif"].includes(s),
+);
 
 const convert = (path: string) => {
   const { dir, name, ext } = parse(path);

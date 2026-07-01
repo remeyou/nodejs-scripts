@@ -7,7 +7,7 @@
   "license": "ISC",
   "author": "",
   "bin": {
-    "ns": "./bin/main.js"
+    "nodejs-scripts": "./bin/main.js"
   },
   "scripts": {
     "build": "webpack",
