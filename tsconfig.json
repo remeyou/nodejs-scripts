@@ -1,9 +1,12 @@
 {
   "compilerOptions": {
-    "target": "ES6",
+    "esModuleInterop": true,
+    "lib": ["ESNext"],
     "module": "CommonJS",
     "outDir": "./bin",
-    "esModuleInterop": true,
-    "strict": true
+    "rootDir": ".",
+    "strict": true,
+    "target": "ES6",
+    "types": ["node"]
   }
 }
