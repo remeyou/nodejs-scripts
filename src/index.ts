@@ -16,6 +16,8 @@ const userArgv0 = process.argv[2];
 if (userArgv0) {
   if (userArgv0 === "random") {
     pickRandomFile();
+  } else if (userArgv0 === "convert") {
+    convertPic();
   }
 } else {
   askFeature()

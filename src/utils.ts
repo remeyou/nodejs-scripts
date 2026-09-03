@@ -6,6 +6,7 @@ import { isAbsolute } from "path";
 import { ErrorMsg, Features, IMAGE_FILE_TYPE } from "./constants";
 
 export const errorFmt = chalk.red;
+export const warningFmt = chalk.yellow;
 export const successFmt = chalk.green;
 export const infoFmt = chalk.gray;
 

@@ -5,7 +5,14 @@ import { parse, resolve, sep } from "path";
 import { exit } from "process";
 import { promisify } from "util";
 import { IMAGE_FILE_TYPE } from "../constants";
-import { askPath, errorFmt, infoFmt, inquirerErr, successFmt } from "../utils";
+import {
+  askPath,
+  errorFmt,
+  infoFmt,
+  inquirerErr,
+  successFmt,
+  warningFmt,
+} from "../utils";
 
 const asyncExecFile = promisify(execFile);
 const supportFileType = IMAGE_FILE_TYPE.filter(
@@ -17,10 +24,12 @@ interface PicInfo {
   originSize?: number;
   outputSize?: number;
   error?: any;
+  filename?: string;
+  output?: string;
 }
 
 const convert = async (path: string): Promise<PicInfo> => {
-  const { dir, name, ext } = parse(path);
+  const { dir, name, ext, base } = parse(path);
   const output = `${dir}${sep}${name}.webp`;
 
   try {
@@ -28,13 +37,16 @@ const convert = async (path: string): Promise<PicInfo> => {
     await asyncExecFile(ext.includes("gif") ? "gif2webp" : "cwebp", [
       "-q",
       "90",
-      "-metadata",
-      "all",
       path,
       "-o",
       output,
     ]);
-    return { path, outputSize: (await stat(output)).size };
+    return {
+      path,
+      outputSize: (await stat(output)).size,
+      filename: base,
+      output,
+    };
   } catch (error) {
     console.error(errorFmt("cwebp executed error:"), error);
     return { path };
@@ -58,7 +70,7 @@ const handleFile = async (path: string): Promise<PicInfo[]> => {
   const stats = await stat(path);
   if (stats.isFile()) {
     if (!supportFileType.includes(parse(path).ext.slice(1))) {
-      console.log(infoFmt("ignore"), infoFmt("->"), path);
+      console.log(infoFmt("[IGNORE]"), path);
       return [{ path }];
     }
     const pic = await convert(path);
@@ -75,13 +87,40 @@ const convertPic = async () => {
   try {
     const pics = await handleFile(await askPath());
     const converts = pics.filter((pic) => pic.outputSize);
+    const unexpected: PicInfo[] = [];
+    const expected: PicInfo[] = [];
     const sum = converts.reduce<{ outputSize: number; originSize: number }>(
       (prev, curr) => {
-        if (typeof curr.outputSize === "number") {
-          prev.outputSize += curr.outputSize;
-        }
-        if (typeof curr.originSize === "number") {
-          prev.originSize += curr.originSize;
+        const { outputSize, originSize, filename, output } = curr;
+        if (typeof outputSize === "number" && typeof originSize === "number") {
+          prev.outputSize += outputSize;
+          prev.originSize += originSize;
+          if (outputSize > originSize * 0.9) {
+            unexpected.push(curr);
+            console.log(
+              warningFmt("[OUTPUT SIZE WARNING]"),
+              "filename:",
+              filename,
+              "output:",
+              formatFileSize(outputSize),
+              "origin:",
+              formatFileSize(originSize),
+              "ratio:",
+              ((outputSize / originSize) * 100).toFixed(2) + "%",
+            );
+          } else {
+            expected.push(curr);
+          }
+        } else {
+          console.error(
+            errorFmt("[DATA TYPE ERROR]"),
+            "filename:",
+            filename,
+            "outputSize:",
+            outputSize,
+            "originSize:",
+            originSize,
+          );
         }
         return prev;
       },
@@ -98,11 +137,21 @@ const convertPic = async () => {
     console.log(
       successFmt(`${converts.length} of ${pics.length} file(s) converted.`),
     );
-    const answer = await confirm({
-      message: `Do you want to remove the original file(s)?`,
-    });
-    if (answer) {
-      await removeFiles(converts);
+    if (
+      unexpected.length &&
+      (await confirm({
+        message: `Do you want to remove the outputs that size more than 90% of origins?`,
+      }))
+    ) {
+      await removeFiles(unexpected, "output");
+    }
+    if (
+      expected.length &&
+      (await confirm({
+        message: `Do you want to remove the original file(s)${unexpected.length ? " besides unexpected outputs" : ""}?`,
+      }))
+    ) {
+      await removeFiles(expected, "path");
     }
   } catch (error) {
     inquirerErr(error);
@@ -113,23 +162,24 @@ const convertPic = async () => {
 
 export default convertPic;
 
-async function removeFiles(pics: PicInfo[]) {
+async function removeFiles(pics: PicInfo[], indexProp: keyof PicInfo) {
   const results = await Promise.allSettled(
-    pics.map((pic) => pic.path && rm(pic.path)),
+    pics.map((pic) => pic[indexProp] && rm(pic[indexProp])),
   );
   const count = results.reduce((prev, curr) => {
     if (curr.status === "fulfilled") {
       return prev + 1;
     }
-    console.error(errorFmt("Error:"), curr.reason);
+    console.error(errorFmt("[ERROR]"), curr.reason);
     return prev;
   }, 0);
   console.log(successFmt(`${count} of ${results.length} file(s) removed.`));
 }
 
 function formatFileSize(bytes: number) {
-  if (bytes < 1024) return `${bytes} B`;
-  if (bytes < 1048576) return `${(bytes / 1024).toFixed(2)} KiB`;
-  if (bytes < 1073741824) return `${(bytes / 1048576).toFixed(2)} MiB`;
+  const abs = Math.abs(bytes);
+  if (abs < 1024) return `${bytes} B`;
+  if (abs < 1048576) return `${(bytes / 1024).toFixed(2)} KiB`;
+  if (abs < 1073741824) return `${(bytes / 1048576).toFixed(2)} MiB`;
   return `${(bytes / 1073741824).toFixed(2)} GiB`;
 }

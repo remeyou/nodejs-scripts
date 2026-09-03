@@ -58,12 +58,9 @@ const pickRandomFile = async () => {
         execFile(`explorer`, [absolutePath]);
         break;
       } catch (error) {
-        console.log("[VOID]", absolutePath);
+        console.log("[ERROR]", absolutePath);
       }
-    } else {
-      console.log("[SKIP]", absolutePath);
     }
-
     idx = idx === list.length - 1 ? 0 : idx + 1;
     if (idx === initIdx) {
       console.log("Cannot find a proper file.");
