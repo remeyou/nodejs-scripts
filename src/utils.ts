@@ -66,6 +66,6 @@ export const askFiletype = () =>
   });
 
 export const inquirerErr = (err: unknown) =>
-  err instanceof Error && err.message === ErrorMsg.UserCancel
-    ? console.log(infoFmt("Ctrl + C pressed, script will exit."))
-    : console.error(errorFmt("Oops! script crashed."), err);
+  err instanceof Error && err.message.includes(ErrorMsg.UserClosed)
+    ? console.log(infoFmt(ErrorMsg.UserClosed))
+    : console.error(errorFmt("Oops! script crashed:"), err);

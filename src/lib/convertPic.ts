@@ -1,18 +1,11 @@
-import confirm from "@inquirer/confirm";
+import checkbox from "@inquirer/checkbox";
 import { execFile } from "child_process";
 import { readdir, rm, stat } from "fs/promises";
 import { parse, resolve, sep } from "path";
 import { exit } from "process";
 import { promisify } from "util";
 import { IMAGE_FILE_TYPE } from "../constants";
-import {
-  askPath,
-  errorFmt,
-  infoFmt,
-  inquirerErr,
-  successFmt,
-  warningFmt,
-} from "../utils";
+import { askPath, errorFmt, inquirerErr, successFmt } from "../utils";
 
 const asyncExecFile = promisify(execFile);
 const supportFileType = IMAGE_FILE_TYPE.filter(
@@ -70,7 +63,6 @@ const handleFile = async (path: string): Promise<PicInfo[]> => {
   const stats = await stat(path);
   if (stats.isFile()) {
     if (!supportFileType.includes(parse(path).ext.slice(1))) {
-      console.log(infoFmt("[IGNORE]"), path);
       return [{ path }];
     }
     const pic = await convert(path);
@@ -83,31 +75,26 @@ const handleFile = async (path: string): Promise<PicInfo[]> => {
   return [];
 };
 
+interface Sum {
+  outputSize: number;
+  originSize: number;
+}
+
 const convertPic = async () => {
   try {
     const pics = await handleFile(await askPath());
     const converts = pics.filter((pic) => pic.outputSize);
     const unexpected: PicInfo[] = [];
     const expected: PicInfo[] = [];
-    const sum = converts.reduce<{ outputSize: number; originSize: number }>(
+
+    const sum = converts.reduce<Sum>(
       (prev, curr) => {
-        const { outputSize, originSize, filename, output } = curr;
+        const { outputSize, originSize, filename } = curr;
         if (typeof outputSize === "number" && typeof originSize === "number") {
           prev.outputSize += outputSize;
           prev.originSize += originSize;
           if (outputSize > originSize * 0.9) {
             unexpected.push(curr);
-            console.log(
-              warningFmt("[OUTPUT SIZE WARNING]"),
-              "filename:",
-              filename,
-              "output:",
-              formatFileSize(outputSize),
-              "origin:",
-              formatFileSize(originSize),
-              "ratio:",
-              ((outputSize / originSize) * 100).toFixed(2) + "%",
-            );
           } else {
             expected.push(curr);
           }
@@ -126,32 +113,96 @@ const convertPic = async () => {
       },
       { outputSize: 0, originSize: 0 },
     );
-    console.table([
-      {
-        Output: formatFileSize(sum.outputSize),
-        Origin: formatFileSize(sum.originSize),
-        Ratio: ((sum.outputSize / sum.originSize) * 100).toFixed(2) + "%",
-        Less: formatFileSize(sum.originSize - sum.outputSize),
-      },
-    ]);
-    console.log(
-      successFmt(`${converts.length} of ${pics.length} file(s) converted.`),
+    const unexpectedSum = unexpected.reduce<Sum>(
+      (prev, curr) => ({
+        outputSize: prev.outputSize + (curr.outputSize ?? 0),
+        originSize: prev.originSize + (curr.originSize ?? 0),
+      }),
+      { outputSize: 0, originSize: 0 },
     );
-    if (
-      unexpected.length &&
-      (await confirm({
-        message: `Do you want to remove the outputs that size more than 90% of origins?`,
-      }))
-    ) {
+    const expectedSum = expected.reduce<Sum>(
+      (prev, curr) => ({
+        outputSize: prev.outputSize + (curr.outputSize ?? 0),
+        originSize: prev.originSize + (curr.originSize ?? 0),
+      }),
+      { outputSize: 0, originSize: 0 },
+    );
+
+    console.table(
+      [
+        {
+          Type: "Expected (<90%)",
+          Count: expected.length,
+          Output: formatFileSize(expectedSum.outputSize),
+          Ratio:
+            (
+              (expectedSum.outputSize / (expectedSum.originSize || 1)) *
+              100
+            ).toFixed(2) + "%",
+          Less: formatFileSize(expectedSum.originSize - expectedSum.outputSize),
+          Origin: formatFileSize(expectedSum.originSize),
+        },
+      ].concat(
+        unexpected.length
+          ? [
+              {
+                Type: "Unexpected (>90%)",
+                Count: unexpected.length,
+                Output: formatFileSize(unexpectedSum.outputSize),
+                Ratio:
+                  (
+                    (unexpectedSum.outputSize /
+                      (unexpectedSum.originSize || 1)) *
+                    100
+                  ).toFixed(2) + "%",
+                Less: formatFileSize(
+                  unexpectedSum.originSize - unexpectedSum.outputSize,
+                ),
+                Origin: formatFileSize(unexpectedSum.originSize),
+              },
+              {
+                Type: "All",
+                Count: converts.length,
+                Output: formatFileSize(sum.outputSize),
+                Ratio:
+                  ((sum.outputSize / (sum.originSize || 1)) * 100).toFixed(2) +
+                  "%",
+                Less: formatFileSize(sum.originSize - sum.outputSize),
+                Origin: formatFileSize(sum.originSize),
+              },
+            ]
+          : [],
+      ),
+    );
+    const ignoreCount = pics.length - converts.length;
+    ignoreCount && console.log(ignoreCount + " file(s) are ignored.");
+
+    const choices = [
+      { name: "Expected origins (<90%)", value: "expected", checked: true },
+      { name: "All converted origins", value: "origins" },
+      { name: "All converted outputs", value: "outputs" },
+    ];
+    unexpected.length &&
+      choices.splice(1, 0, {
+        name: "Unexpected outputs (>90%)",
+        value: "unexpected",
+        checked: true,
+      });
+    const checks = await checkbox({
+      message: "Which files do you want to remove?",
+      choices,
+    });
+    if (checks.includes("expected")) {
+      await removeFiles(expected, "path");
+    }
+    if (checks.includes("unexpected")) {
       await removeFiles(unexpected, "output");
     }
-    if (
-      expected.length &&
-      (await confirm({
-        message: `Do you want to remove the original file(s)${unexpected.length ? " besides unexpected outputs" : ""}?`,
-      }))
-    ) {
-      await removeFiles(expected, "path");
+    if (checks.includes("origins")) {
+      await removeFiles(converts, "path");
+    }
+    if (checks.includes("outputs")) {
+      await removeFiles(converts, "output");
     }
   } catch (error) {
     inquirerErr(error);
