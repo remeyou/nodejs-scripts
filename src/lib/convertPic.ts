@@ -128,64 +128,65 @@ const convertPic = async () => {
       { outputSize: 0, originSize: 0 },
     );
 
-    console.table(
-      [
-        {
-          Type: "Expected (<90%)",
-          Count: expected.length,
-          Output: formatFileSize(expectedSum.outputSize),
-          Ratio:
-            (
-              (expectedSum.outputSize / (expectedSum.originSize || 1)) *
-              100
-            ).toFixed(2) + "%",
-          Less: formatFileSize(expectedSum.originSize - expectedSum.outputSize),
-          Origin: formatFileSize(expectedSum.originSize),
-        },
-      ].concat(
-        unexpected.length
-          ? [
-              {
-                Type: "Unexpected (>90%)",
-                Count: unexpected.length,
-                Output: formatFileSize(unexpectedSum.outputSize),
-                Ratio:
-                  (
-                    (unexpectedSum.outputSize /
-                      (unexpectedSum.originSize || 1)) *
-                    100
-                  ).toFixed(2) + "%",
-                Less: formatFileSize(
-                  unexpectedSum.originSize - unexpectedSum.outputSize,
-                ),
-                Origin: formatFileSize(unexpectedSum.originSize),
-              },
-              {
-                Type: "All",
-                Count: converts.length,
-                Output: formatFileSize(sum.outputSize),
-                Ratio:
-                  ((sum.outputSize / (sum.originSize || 1)) * 100).toFixed(2) +
-                  "%",
-                Less: formatFileSize(sum.originSize - sum.outputSize),
-                Origin: formatFileSize(sum.originSize),
-              },
-            ]
-          : [],
-      ),
-    );
+    const table = [];
+    expected.length &&
+      table.push({
+        Type: "Expected (<90%)",
+        Count: expected.length,
+        Output: formatFileSize(expectedSum.outputSize),
+        Ratio:
+          (
+            (expectedSum.outputSize / (expectedSum.originSize || 1)) *
+            100
+          ).toFixed(2) + "%",
+        Less: formatFileSize(expectedSum.originSize - expectedSum.outputSize),
+        Origin: formatFileSize(expectedSum.originSize),
+      });
+    unexpected.length &&
+      table.push({
+        Type: "Unexpected (>90%)",
+        Count: unexpected.length,
+        Output: formatFileSize(unexpectedSum.outputSize),
+        Ratio:
+          (
+            (unexpectedSum.outputSize / (unexpectedSum.originSize || 1)) *
+            100
+          ).toFixed(2) + "%",
+        Less: formatFileSize(
+          unexpectedSum.originSize - unexpectedSum.outputSize,
+        ),
+        Origin: formatFileSize(unexpectedSum.originSize),
+      });
+    expected.length &&
+      unexpected.length &&
+      table.push({
+        Type: "All",
+        Count: converts.length,
+        Output: formatFileSize(sum.outputSize),
+        Ratio:
+          ((sum.outputSize / (sum.originSize || 1)) * 100).toFixed(2) + "%",
+        Less: formatFileSize(sum.originSize - sum.outputSize),
+        Origin: formatFileSize(sum.originSize),
+      });
+    console.table(table);
+
     const ignoreCount = pics.length - converts.length;
     ignoreCount && console.log(ignoreCount + " file(s) are ignored.");
 
     const choices = [
-      { name: "Expected origins (<90%)", value: "expected", checked: true },
-      { name: "All converted origins", value: "origins" },
-      { name: "All converted outputs", value: "outputs" },
+      { name: "All converted origins", value: "origins", checked: false },
+      { name: "All converted outputs", value: "outputs", checked: false },
     ];
     unexpected.length &&
-      choices.splice(1, 0, {
+      choices.unshift({
         name: "Unexpected outputs (>90%)",
         value: "unexpected",
+        checked: true,
+      });
+    expected.length &&
+      choices.unshift({
+        name: "Expected origins (<90%)",
+        value: "expected",
         checked: true,
       });
     const checks = await checkbox({
